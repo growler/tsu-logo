@@ -1,0 +1,108 @@
+%% ---------------------------------------------------------------------------
+%% Tula State University Logo
+%% (c) TSU
+%% TeX programming by Alexey Naidyonov 2014
+%% ---------------------------------------------------------------------------
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tsu-logo}[2014/02/03 v0.1 Tula State University Logo]
+
+\RequirePackage{tikz}
+\RequirePackage{fontspec}
+\usetikzlibrary{decorations.text}
+
+\newsavebox\@TSULogo@box
+\savebox\@TSULogo@box{%
+\begin{tikzpicture}
+  % requires tikz, fontspec
+  \usetikzlibrary{calc}
+  % внутренний диаметр лого
+  \def\logosize{1cm}
+  \edef\logohs{\the\dimexpr \logosize / 2\relax}%
+  \useasboundingbox (-\logohs,-\logohs) rectangle (\logohs,\logohs);
+  % цвета российского флага (цвета книг на логотипе)
+  \definecolor{RFW}{rgb}{1,1,1}
+  \definecolor{RFR}{rgb}{0.8516,0.1602,0.1094}
+  \definecolor{RFB}{rgb}{0,0.2383,0.6445}
+  % размер шрифта для лого
+  \def\logofontsize{\the\dimexpr \logosize / 14\relax}
+  % шрифт для логотипа (Arial)
+  \def\fnt{\fontsize{\logofontsize}{\logofontsize}\fontspec{Arial}}
+  % высота буквы T
+  \path (0,0) node[anchor=south west, inner sep=0pt, outer sep=0pt] (S) {\vphantom{\fnt T}};
+  \newdimen{\logoth}
+  \pgfextracty{\logoth}{\pgfpointanchor{S}{north}}
+  \edef\lrad{\the\dimexpr \logohs - \logoth\relax}
+  \pgfmathsetmacro{\w}{\lrad}         % Ширина изображения книги
+  \pgfmathsetmacro{\wp}{\w / 100}     % отступ справа (страницы)
+  \pgfmathsetmacro{\h}{\w / 3.5}      % высока книги
+  \pgfmathsetmacro{\wdl}{\lrad / 50}  % толщина линии обложки
+  \pgfmathsetmacro{\wdr}{\lrad / 200} % толщина линии справа (границы страниц)
+  \coordinate (w)  at (\w pt,0); % ширина
+  \coordinate (h)  at (0,\h pt); % высота
+  \def\book#1#2{% Стилизованное изображение книги (цвет, относительное положение)
+    \begin{scope}
+      % левый правый угол книги
+      \coordinate (ws) at ($-23/50*(w) + #2/4*(w) + #2*(h) + #2/6*(h)$);
+      % контур страниц
+      \path [fill=#1]
+          ($(ws) - 1/2*(h)$) arc [
+              start angle=270, end angle=90,
+              x radius=\the\dimexpr \h pt / 3\relax,
+              y radius=\the\dimexpr \h pt / 2\relax
+          ] -- ++(w) -- ++(0, -\wdr pt) -- ++(-\wp pt, 0) arc [
+              start angle=90, end angle=270,
+              x radius=\the\dimexpr \h pt / 6\relax,
+              y radius=\the\dimexpr (\h pt - \wdr pt - \wdr pt) / 2\relax
+          ] -- ++(\wp pt, 0) -- ++(0, -\wdr pt) -- cycle;
+      % контур обложки
+      \path [fill=black] ($(ws) - 1/2*(h)$) arc [
+              start angle=270, end angle=90,
+              x radius=\the\dimexpr \h pt / 3\relax,
+              y radius=\the\dimexpr \h pt / 2\relax
+      ] -- ++(w) -- ++(0, -\wdl pt) -- ++($-1*(w)$) arc [
+              start angle=90, end angle=270,
+              x radius=\the\dimexpr \h pt / 6\relax,
+              y radius=\the\dimexpr (\h pt - \wdl pt - \wdl pt) / 2\relax
+      ] -- ++(w) -- ++(0, -\wdl pt) -- cycle;
+      % линия -- граница страниц
+      \draw[line width=\wdr pt]
+          ($(ws) + (w) - (\wp pt, \wdr pt) + 1/2*(h) $)
+          arc [
+              start angle=90, end angle=270,
+              x radius=\the\dimexpr \h pt / 6\relax,
+              y radius=\the\dimexpr (\h pt - \wdr pt - \wdr pt) / 2\relax
+          ];
+    \end{scope}
+  }
+  \book{RFW}{ 1} % верхняя -- белая
+  \book{RFB}{ 0} % средняя -- синяя
+  \book{RFR}{-1} % нижняя -- красная
+  % верхняя часть надписи (на радиусе \lrad)
+  \path [postaction={decorate,
+          decoration={
+            text along path,
+            reverse path,
+            text align=fit to path,
+            text={|\fnt|ТУЛЬСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ}}}
+        ] (-22:\lrad) arc (-22:202:\lrad);
+  % нижняя часть надписи  (на радиусе \lrad + \logoth)
+  \path [postaction={decorate,
+          decoration={
+            text along path,
+            text align=fit to path,
+            text={|\fnt|TULA STATE UNIVERSITY}}}
+        ] (216:\the\dimexpr \lrad + \logoth\relax) arc
+          (216:324:\the\dimexpr \lrad + \logoth\relax);
+  % разделители (на радиусе \lrad + 1/2\logoth)
+  \fill (209:\the\dimexpr\lrad + .5\logoth\relax) circle [radius=\the\dimexpr .35\logoth\relax];
+  \fill (331:\the\dimexpr\lrad + .5\logoth\relax) circle [radius=\the\dimexpr .35\logoth\relax];
+  % \draw[line width=0.1pt] (current bounding box.south west) rectangle (current bounding box.north east);
+\end{tikzpicture}%
+}%
+\immediate\saveboxresource\@TSULogo@box%
+\xdef\@TSULogo@xref{\the\lastsavedboxresourceindex\relax}%
+\def\TSULogo{\useboxresource\@TSULogo@xref}%
+
+\endinput
+%%
+%% End of file `itoolabs-graphics.sty'.
